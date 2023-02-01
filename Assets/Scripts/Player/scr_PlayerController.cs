@@ -1,0 +1,106 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using static scr_Models;
+
+public class scr_PlayerController : MonoBehaviour {
+
+    private CharacterController characterController;
+    private DefaultInput inputActions;
+    public Vector2 inputMovement;
+    public Vector2 inputView;
+
+    private Vector3 newCameraRotation;
+    private Vector3 newPlayerRotation;
+
+    public float jumpingForce;
+
+    private float ViewInputSensitivity = 20f;
+    private float gravityValue = -10f;
+    private float gravityValueMultiplier = 5f;
+    private float jumpingForceValue = 15f;
+    private float playerSpeedValue = 8f;
+    private float ViewClampYMin = -80f;
+    private float ViewClampYMax = 80f;
+    private bool DefaultInverted = false;
+
+    [Header("Preferences")]
+    public Transform cameraHolder;
+
+    [Header("Settings")]
+    public PlayerSettingsModel playerSettings;
+
+    private void Awake() {
+
+        inputActions = new DefaultInput();
+        characterController = GetComponent<CharacterController>();
+
+        inputActions.Player.Movement.performed += e => inputMovement = e.ReadValue<Vector2>();
+        inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
+        inputActions.Player.Jump.performed += e => Jump();
+
+        newPlayerRotation = transform.localRotation.eulerAngles;
+        newCameraRotation = cameraHolder.localRotation.eulerAngles;
+
+        playerSettings.viewXSensitivity = ViewInputSensitivity;
+        playerSettings.viewYSensitivity = ViewInputSensitivity;
+        playerSettings.viewXInverted = DefaultInverted;
+        playerSettings.viewYInverted = !DefaultInverted;
+        playerSettings.playerSpeed = playerSpeedValue;
+        playerSettings.viewClampYMin = ViewClampYMin;
+        playerSettings.viewClampYMax = ViewClampYMax;
+        playerSettings.gravity = gravityValue;
+        playerSettings.gravityMultiplier = gravityValueMultiplier;
+        playerSettings.jumpPower = jumpingForceValue;
+
+        inputActions.Enable();
+    }
+
+    private void Update() {
+        CalculateView();
+        CalculateMovement();
+        ApplyGravity();
+    }
+
+    private void CalculateMovement() {
+
+        var verticalSpeed = playerSettings.playerSpeed * inputMovement.y * Time.deltaTime;
+        var horizontalSpeed = playerSettings.playerSpeed * inputMovement.x * Time.deltaTime;
+
+        Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime,verticalSpeed);
+        newMovementDirection = transform.TransformDirection(newMovementDirection);
+
+        characterController.Move(newMovementDirection);
+    }
+
+    private void CalculateView() {
+
+        newPlayerRotation.y += playerSettings.viewXSensitivity * (playerSettings.viewXInverted ? -inputView.x : inputView.x) * Time.deltaTime;
+        transform.localRotation = Quaternion.Euler(newPlayerRotation);
+
+        newCameraRotation.x += playerSettings.viewYSensitivity * (playerSettings.viewYInverted ? -inputView.y : inputView.y) * Time.deltaTime;
+        newCameraRotation.x = Mathf.Clamp(newCameraRotation.x, playerSettings.viewClampYMin, playerSettings.viewClampYMax);
+
+        cameraHolder.localRotation = Quaternion.Euler(newCameraRotation);
+    }
+
+    private void ApplyGravity() {
+
+        if (characterController.isGrounded) {
+            jumpingForce = -1f;
+        }
+        else {
+            jumpingForce += playerSettings.gravity * playerSettings.gravityMultiplier * Time.deltaTime;
+        }
+    }
+
+    private void Jump() {
+
+        if(!characterController.isGrounded) {
+            return;
+        }
+
+        jumpingForce += playerSettings.jumpPower;
+    }
+}
