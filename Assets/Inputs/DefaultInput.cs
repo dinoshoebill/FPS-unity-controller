@@ -144,7 +144,7 @@ public partial class @DefaultInput : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""fc789849-6600-4e2f-ae59-fec8a26d72b7"",
                     ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
+                    ""interactions"": ""SlowTap(duration=0.3),Tap(duration=0.3)"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
