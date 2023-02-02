@@ -23,6 +23,7 @@ public class scr_PlayerController : MonoBehaviour {
     private float playerSpeedValue = 8f;
     private float ViewClampYMin = -80f;
     private float ViewClampYMax = 80f;
+    private float playerStanceSmoothing = 15f;
     private bool DefaultInverted = false;
 
     [Header("Preferences")]
@@ -31,6 +32,13 @@ public class scr_PlayerController : MonoBehaviour {
     [Header("Settings")]
     public PlayerSettingsModel playerSettings;
 
+    [Header("Stance")]
+    public PlayerStance playerStance;
+    private Vector3 playerCameraVelocity;
+    public Transform cameraPositionStand;
+    public Transform cameraPositionCrouch;
+    public Transform cameraPositionProne;
+
     private void Awake() {
 
         inputActions = new DefaultInput();
@@ -38,20 +46,34 @@ public class scr_PlayerController : MonoBehaviour {
 
         inputActions.Player.Movement.performed += e => inputMovement = e.ReadValue<Vector2>();
         inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
-        inputActions.Player.Jump.performed += e => Jump();
+        inputActions.Player.Jump.performed += e => {
+            if (playerStance == PlayerStance.Stand) {
+                Jump();
+            }
+            else {
+                SetPlayerStance(PlayerStance.Stand);
+            }
+        };
+        inputActions.Player.Crouch.performed += e => SetPlayerStance(PlayerStance.Crouch);
+        inputActions.Player.Prone.performed += e => SetPlayerStance(PlayerStance.Prone);
 
         newPlayerRotation = transform.localRotation.eulerAngles;
         newCameraRotation = cameraHolder.localRotation.eulerAngles;
 
         playerSettings.viewXSensitivity = ViewInputSensitivity;
         playerSettings.viewYSensitivity = ViewInputSensitivity;
+
         playerSettings.viewXInverted = DefaultInverted;
         playerSettings.viewYInverted = !DefaultInverted;
+
         playerSettings.playerSpeed = playerSpeedValue;
+
         playerSettings.viewClampYMin = ViewClampYMin;
         playerSettings.viewClampYMax = ViewClampYMax;
+
         playerSettings.gravity = gravityValue;
         playerSettings.gravityMultiplier = gravityValueMultiplier;
+
         playerSettings.jumpPower = jumpingForceValue;
 
         inputActions.Enable();
@@ -61,6 +83,18 @@ public class scr_PlayerController : MonoBehaviour {
         CalculateView();
         CalculateMovement();
         ApplyGravity();
+        CalculateCameraPosition();
+    }
+
+    private void CalculateCameraPosition() {
+
+        if (playerStance == PlayerStance.Crouch) {
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+        } else if (playerStance == PlayerStance.Prone) {
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+        } else {
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+        }
     }
 
     private void CalculateMovement() {
@@ -102,5 +136,9 @@ public class scr_PlayerController : MonoBehaviour {
         }
 
         jumpingForce += playerSettings.jumpPower;
+    }
+
+    private void SetPlayerStance(PlayerStance playerStance) {
+        this.playerStance = playerStance;
     }
 }
