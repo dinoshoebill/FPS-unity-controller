@@ -38,12 +38,14 @@ public class scr_PlayerController : MonoBehaviour {
     [Header("Stance")]
     public PlayerStance playerStance;
     private Vector3 playerCameraVelocity;
+    private float playerStanceVelocityFloat;
+    private Vector3 playerStanceVelocityVector;
     public Transform cameraPositionStand;
     public Transform cameraPositionCrouch;
     public Transform cameraPositionProne;
-    public PlayerStanceCollider playerStanceStand;
-    public PlayerStanceCollider playerStanceCrouch;
-    public PlayerStanceCollider playerStanceProne;
+    public PlayerStanceCollider playerStanceColliderStand;
+    public PlayerStanceCollider playerStanceColliderCrouch;
+    public PlayerStanceCollider playerStanceColliderProne;
 
     private void Awake() {
 
@@ -99,10 +101,16 @@ public class scr_PlayerController : MonoBehaviour {
 
         if (playerStance == PlayerStance.Crouch) {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderCrouch.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderCrouch.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         } else if (playerStance == PlayerStance.Prone) {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderProne.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderProne.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         } else {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderStand.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderStand.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         }
     }
 
