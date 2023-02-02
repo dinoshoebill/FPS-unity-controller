@@ -20,7 +20,10 @@ public class scr_PlayerController : MonoBehaviour {
     private float gravityValue = -10f;
     private float gravityValueMultiplier = 5f;
     private float jumpingForceValue = 15f;
-    private float playerSpeedValue = 8f;
+    private float playerSpeedStandValue = 8f;
+    private float playerSpeedCrouchValue = 4f;
+    private float playerSpeedProneValue = 2f;
+    private float playerSpeedSprintValue = 10f;
     private float ViewClampYMin = -80f;
     private float ViewClampYMax = 80f;
     private float playerStanceSmoothing = 15f;
@@ -38,6 +41,9 @@ public class scr_PlayerController : MonoBehaviour {
     public Transform cameraPositionStand;
     public Transform cameraPositionCrouch;
     public Transform cameraPositionProne;
+    public PlayerStance playerStanceStand;
+    public PlayerStance playerStanceCrouch;
+    public PlayerStance playerStanceProne;
 
     private void Awake() {
 
@@ -66,7 +72,10 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.viewXInverted = DefaultInverted;
         playerSettings.viewYInverted = !DefaultInverted;
 
-        playerSettings.playerSpeed = playerSpeedValue;
+        playerSettings.playerSpeedSprint = playerSpeedSprintValue;
+        playerSettings.playerSpeedStand = playerSpeedStandValue;
+        playerSettings.playerSpeedCrouch = playerSpeedCrouchValue;
+        playerSettings.playerSpeedProne = playerSpeedProneValue;
 
         playerSettings.viewClampYMin = ViewClampYMin;
         playerSettings.viewClampYMax = ViewClampYMax;
@@ -99,10 +108,20 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void CalculateMovement() {
 
-        var verticalSpeed = playerSettings.playerSpeed * inputMovement.y * Time.deltaTime;
-        var horizontalSpeed = playerSettings.playerSpeed * inputMovement.x * Time.deltaTime;
+        float playerSpeed = playerSettings.playerSpeedStand;
 
-        Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime,verticalSpeed);
+        if(playerStance == PlayerStance.Sprint) {
+            playerSpeed = playerSettings.playerSpeedSprint;
+        } else if(playerStance == PlayerStance.Crouch) {
+            playerSpeed = playerSettings.playerSpeedCrouch;
+        } else if(playerStance == PlayerStance.Prone) {
+            playerSpeed = playerSettings.playerSpeedProne;
+        }
+
+        var verticalSpeed = playerSpeed * inputMovement.y * Time.deltaTime;
+        var horizontalSpeed = playerSpeed * inputMovement.x * Time.deltaTime;
+
+        Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
         newMovementDirection = transform.TransformDirection(newMovementDirection);
 
         characterController.Move(newMovementDirection);

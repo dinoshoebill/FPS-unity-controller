@@ -8,6 +8,7 @@ public static class scr_Models{
     #region - Player -
 
     public enum PlayerStance {
+        Sprint,
         Stand,
         Crouch,
         Prone
@@ -25,7 +26,10 @@ public static class scr_Models{
         public float viewClampYMax;
 
         [Header("Movement Settings")]
-        public float playerSpeed;
+        public float playerSpeedSprint;
+        public float playerSpeedStand;
+        public float playerSpeedProne;
+        public float playerSpeedCrouch;
 
         [Header("Jump Settings")]
         public float jumpPower;
@@ -33,6 +37,11 @@ public static class scr_Models{
         [Header("Jump Settings")]
         public float gravity;
         public float gravityMultiplier;
+    }
+
+    [Serializable]
+    public class PlayerStanceCollider {
+        public CapsuleCollider playerStanceCollider;
     }
 
     #endregion
