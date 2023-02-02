@@ -6,7 +6,7 @@ using static scr_Models;
 
 public class scr_PlayerController : MonoBehaviour {
 
-    private CharacterController characterController;
+    private CharacterController playerController;
     private DefaultInput inputActions;
     public Vector2 inputMovement;
     public Vector2 inputView;
@@ -41,14 +41,14 @@ public class scr_PlayerController : MonoBehaviour {
     public Transform cameraPositionStand;
     public Transform cameraPositionCrouch;
     public Transform cameraPositionProne;
-    public PlayerStance playerStanceStand;
-    public PlayerStance playerStanceCrouch;
-    public PlayerStance playerStanceProne;
+    public PlayerStanceCollider playerStanceStand;
+    public PlayerStanceCollider playerStanceCrouch;
+    public PlayerStanceCollider playerStanceProne;
 
     private void Awake() {
 
         inputActions = new DefaultInput();
-        characterController = GetComponent<CharacterController>();
+        playerController = GetComponent<CharacterController>();
 
         inputActions.Player.Movement.performed += e => inputMovement = e.ReadValue<Vector2>();
         inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
@@ -124,7 +124,7 @@ public class scr_PlayerController : MonoBehaviour {
         Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
         newMovementDirection = transform.TransformDirection(newMovementDirection);
 
-        characterController.Move(newMovementDirection);
+        playerController.Move(newMovementDirection);
     }
 
     private void CalculateView() {
@@ -140,7 +140,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void ApplyGravity() {
 
-        if (characterController.isGrounded) {
+        if (playerController.isGrounded) {
             jumpingForce = -1f;
         }
         else {
@@ -150,7 +150,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void Jump() {
 
-        if(!characterController.isGrounded) {
+        if(!playerController.isGrounded) {
             return;
         }
 
@@ -158,6 +158,11 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void SetPlayerStance(PlayerStance playerStance) {
-        this.playerStance = playerStance;
+        if (!playerController.isGrounded && playerStance == PlayerStance.Crouch) {
+            return;
+        }
+        else {
+            this.playerStance = playerStance;
+        }
     }
 }

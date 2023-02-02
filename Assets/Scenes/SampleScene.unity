@@ -895,11 +895,11 @@ GameObject:
   - component: {fileID: 1564942422}
   - component: {fileID: 1564942421}
   - component: {fileID: 1564942420}
+  - component: {fileID: 1564942423}
   - component: {fileID: 1564942419}
   - component: {fileID: 1564942426}
   - component: {fileID: 1564942425}
   - component: {fileID: 1564942424}
-  - component: {fileID: 1564942423}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1013,7 +1013,10 @@ MonoBehaviour:
     viewYInverted: 0
     viewClampYMin: -80
     viewClampYMax: 80
-    playerSpeed: 0
+    playerSpeedSprint: 0
+    playerSpeedStand: 0
+    playerSpeedProne: 0
+    playerSpeedCrouch: 0
     jumpPower: 0
     gravity: 0
     gravityMultiplier: 0
@@ -1021,6 +1024,12 @@ MonoBehaviour:
   cameraPositionStand: {fileID: 617158540}
   cameraPositionCrouch: {fileID: 1788631176}
   cameraPositionProne: {fileID: 1754418274}
+  playerStanceStand:
+    playerStanceCollider: {fileID: 1564942419}
+  playerStanceCrouch:
+    playerStanceCollider: {fileID: 1564942426}
+  playerStanceProne:
+    playerStanceCollider: {fileID: 1564942425}
 --- !u!143 &1564942424
 CharacterController:
   m_ObjectHideFlags: 0
