@@ -15,6 +15,7 @@ public class scr_PlayerController : MonoBehaviour {
     private Vector3 newPlayerRotation;
     
     private float jumpingForce;
+    private float currentPlayerSpeed;
 
     private float doubleJumpMultiplier = 1.3f;
     private float jumpMultiplier = 1f;
@@ -93,6 +94,7 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.jumpPower = jumpingForceValue;
 
         playerStance = PlayerStance.Stand;
+        currentPlayerSpeed = playerSpeedStandValue;
 
         inputActions.Enable();
     }
@@ -123,18 +125,8 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void CalculateMovement() {
 
-        float playerSpeed = playerSettings.playerSpeedStand;
-
-        if (playerStance == PlayerStance.Sprint) {
-            playerSpeed = playerSettings.playerSpeedSprint;
-        } else if (playerStance == PlayerStance.Crouch) {
-            playerSpeed = playerSettings.playerSpeedCrouch;
-        } else if (playerStance == PlayerStance.Prone) {
-            playerSpeed = playerSettings.playerSpeedProne;
-        }
-
-        var verticalSpeed = playerSpeed * inputMovement.y * Time.deltaTime;
-        var horizontalSpeed = playerSpeed * inputMovement.x * Time.deltaTime;
+        var verticalSpeed = currentPlayerSpeed * inputMovement.y * Time.deltaTime;
+        var horizontalSpeed = currentPlayerSpeed * inputMovement.x * Time.deltaTime;
 
         Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
         newMovementDirection = transform.TransformDirection(newMovementDirection);
@@ -182,8 +174,7 @@ public class scr_PlayerController : MonoBehaviour {
                 if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
                     return;
                 } else {
-                    playerStance = PlayerStance.Stand;
-                    return;
+                    nextPlayerStance = PlayerStance.Stand;
                 }
             } else if (CanChangeStance(playerStanceCrouch.playerStanceCollider.height) || !playerController.isGrounded) {
                 return;
@@ -191,7 +182,16 @@ public class scr_PlayerController : MonoBehaviour {
         }
         
         playerStance = nextPlayerStance;
+        SetPlayerSpeed(playerStance);
+    }
 
+    private void SetPlayerSpeed(PlayerStance newPlayerStance) {
+        if (newPlayerStance == PlayerStance.Sprint || newPlayerStance == PlayerStance.Stand)
+            currentPlayerSpeed = playerSettings.playerSpeedSprint;
+        else if (newPlayerStance == PlayerStance.Crouch)
+            currentPlayerSpeed = playerSettings.playerSpeedCrouch;
+        else if (newPlayerStance == PlayerStance.Prone)
+            currentPlayerSpeed = playerSettings.playerSpeedProne;
     }
 
     private bool CanChangeStance(float stanceCheckHeight) {
