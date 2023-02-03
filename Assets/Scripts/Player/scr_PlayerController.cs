@@ -33,9 +33,11 @@ public class scr_PlayerController : MonoBehaviour {
 
     [Header("Preferences")]
     public Transform cameraHolder;
+    public Transform pivotTransform;
 
     [Header("Settings")]
     public PlayerSettingsModel playerSettings;
+    public LayerMask playerMask;
 
     [Header("Stance")]
     public PlayerStance playerStance;
@@ -45,9 +47,9 @@ public class scr_PlayerController : MonoBehaviour {
     public Transform cameraPositionStand;
     public Transform cameraPositionCrouch;
     public Transform cameraPositionProne;
-    public PlayerStanceCollider playerStanceColliderStand;
-    public PlayerStanceCollider playerStanceColliderCrouch;
-    public PlayerStanceCollider playerStanceColliderProne;
+    public PlayerStanceCollider playerStanceStand;
+    public PlayerStanceCollider playerStanceCrouch;
+    public PlayerStanceCollider playerStanceProne;
 
     private void Awake() {
 
@@ -57,17 +59,13 @@ public class scr_PlayerController : MonoBehaviour {
         inputActions.Player.Movement.performed += e => inputMovement = e.ReadValue<Vector2>();
         inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
         inputActions.Player.Jump.performed += e => {
-            Debug.Log(e.interaction);
-            if (playerStance == PlayerStance.Stand && playerController.isGrounded) {
-                if (e.interaction is UnityEngine.InputSystem.Interactions.TapInteraction) {
+            if(playerStance == PlayerStance.Stand || playerStance == PlayerStance.Sprint)
+                if (e.interaction is UnityEngine.InputSystem.Interactions.TapInteraction)
                     Jump(jumpMultiplier);
-                } else {
+                else
                     Jump(doubleJumpMultiplier);
-                }
-            }
-            else {
+            else
                 SetPlayerStance(PlayerStance.Stand);
-            }
         };
         inputActions.Player.Crouch.performed += e => SetPlayerStance(PlayerStance.Crouch);
         inputActions.Player.Prone.performed += e => SetPlayerStance(PlayerStance.Prone);
@@ -110,16 +108,16 @@ public class scr_PlayerController : MonoBehaviour {
 
         if (playerStance == PlayerStance.Crouch) {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderCrouch.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderCrouch.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceCrouch.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceCrouch.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         } else if (playerStance == PlayerStance.Prone) {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderProne.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderProne.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceProne.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceProne.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         } else {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceColliderStand.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceColliderStand.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceStand.playerStanceCollider.height, ref playerStanceVelocityFloat, playerStanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceStand.playerStanceCollider.center, ref playerStanceVelocityVector, playerStanceSmoothing * Time.deltaTime);
         }
     }
 
@@ -173,15 +171,33 @@ public class scr_PlayerController : MonoBehaviour {
         jumpingForce += playerSettings.jumpPower * jumpStrength;
     }
 
-    private void SetPlayerStance(PlayerStance playerStance) {
-        if (playerStance == PlayerStance.Crouch) {
-            if (this.playerStance == PlayerStance.Crouch) {
-                this.playerStance = PlayerStance.Prone;
-            } else if (playerController.isGrounded) {
-                this.playerStance = playerStance;
+    private void SetPlayerStance(PlayerStance nextPlayerStance) {
+
+        if (nextPlayerStance == PlayerStance.Sprint || nextPlayerStance == PlayerStance.Stand) {
+            if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
+                return;
             }
-        } else {
-            this.playerStance = playerStance;
+        } else if (nextPlayerStance == PlayerStance.Crouch) {
+            if (nextPlayerStance.CompareTo(playerStance) == 0) {
+                if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
+                    return;
+                } else {
+                    playerStance = PlayerStance.Stand;
+                    return;
+                }
+            } else if (CanChangeStance(playerStanceCrouch.playerStanceCollider.height) || !playerController.isGrounded) {
+                return;
+            }
         }
+        
+        playerStance = nextPlayerStance;
+
+    }
+
+    private bool CanChangeStance(float stanceCheckHeight) {
+        
+        Vector3 start = new Vector3(pivotTransform.position.x, pivotTransform.position.y + playerController.radius + 0.01f, pivotTransform.position.z);
+        Vector3 end = new Vector3(pivotTransform.position.x, pivotTransform.position.y - playerController.radius - 0.01f + stanceCheckHeight, pivotTransform.position.z);
+        return Physics.CheckCapsule(start, end, playerController.radius, playerMask);
     }
 }
