@@ -95,8 +95,6 @@ public class scr_PlayerController : MonoBehaviour {
         CalculateMovement();
         ApplyGravity();
         CalculateCameraPosition();
-        Debug.Log(playerStance);
-        Debug.Log(CanChangeStance(playerStanceStand.playerStanceCollider.height));
     }
 
     private void CalculateCameraPosition() {
