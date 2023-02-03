@@ -16,6 +16,8 @@ public class scr_PlayerController : MonoBehaviour {
     
     private float jumpingForce;
     private float currentPlayerSpeed;
+    private float strafeSpeedMultiplier = 0.7f;
+    private bool isSprinting;
 
     private float doubleJumpMultiplier = 1.3f;
     private float jumpMultiplier = 1f;
@@ -23,10 +25,10 @@ public class scr_PlayerController : MonoBehaviour {
     private float gravityValue = -10f;
     private float gravityValueMultiplier = 5f;
     private float jumpingForceValue = 15f;
-    private float playerSpeedStandValue = 8f;
+    private float playerSpeedSprintValue = 20f;
+    private float playerSpeedStandValue = 6f;
     private float playerSpeedCrouchValue = 4f;
     private float playerSpeedProneValue = 2f;
-    private float playerSpeedSprintValue = 10f;
     private float ViewClampYMin = -80f;
     private float ViewClampYMax = 80f;
     private float playerStanceSmoothing = 15f;
@@ -57,19 +59,7 @@ public class scr_PlayerController : MonoBehaviour {
         inputActions = new DefaultInput();
         playerController = GetComponent<CharacterController>();
 
-        inputActions.Player.Movement.performed += e => inputMovement = e.ReadValue<Vector2>();
-        inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
-        inputActions.Player.Jump.performed += e => {
-            if(playerStance == PlayerStance.Stand || playerStance == PlayerStance.Sprint)
-                if (e.interaction is UnityEngine.InputSystem.Interactions.TapInteraction)
-                    Jump(jumpMultiplier);
-                else
-                    Jump(doubleJumpMultiplier);
-            else
-                SetPlayerStance(PlayerStance.Stand);
-        };
-        inputActions.Player.Crouch.performed += e => SetPlayerStance(PlayerStance.Crouch);
-        inputActions.Player.Prone.performed += e => SetPlayerStance(PlayerStance.Prone);
+        InitializeInputActions();
 
         newPlayerRotation = transform.localRotation.eulerAngles;
         newCameraRotation = cameraHolder.localRotation.eulerAngles;
@@ -94,6 +84,7 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.jumpPower = jumpingForceValue;
 
         playerStance = PlayerStance.Stand;
+        isSprinting = false;
         currentPlayerSpeed = playerSpeedStandValue;
 
         inputActions.Enable();
@@ -104,6 +95,8 @@ public class scr_PlayerController : MonoBehaviour {
         CalculateMovement();
         ApplyGravity();
         CalculateCameraPosition();
+        Debug.Log(playerStance);
+        Debug.Log(CanChangeStance(playerStanceStand.playerStanceCollider.height));
     }
 
     private void CalculateCameraPosition() {
@@ -123,10 +116,9 @@ public class scr_PlayerController : MonoBehaviour {
         }
     }
 
-    private void CalculateMovement() {
-
+    private void CalculateMovement() { 
         var verticalSpeed = currentPlayerSpeed * inputMovement.y * Time.deltaTime;
-        var horizontalSpeed = currentPlayerSpeed * inputMovement.x * Time.deltaTime;
+        var horizontalSpeed = currentPlayerSpeed * strafeSpeedMultiplier * inputMovement.x * Time.deltaTime;
 
         Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
         newMovementDirection = transform.TransformDirection(newMovementDirection);
@@ -165,7 +157,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void SetPlayerStance(PlayerStance nextPlayerStance) {
 
-        if (nextPlayerStance == PlayerStance.Sprint || nextPlayerStance == PlayerStance.Stand) {
+        if (nextPlayerStance == PlayerStance.Stand) {
             if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
                 return;
             }
@@ -176,9 +168,9 @@ public class scr_PlayerController : MonoBehaviour {
                 } else {
                     nextPlayerStance = PlayerStance.Stand;
                 }
-            } else if (CanChangeStance(playerStanceCrouch.playerStanceCollider.height) || !playerController.isGrounded) {
-                return;
             }
+        } else if (CanChangeStance(playerStanceCrouch.playerStanceCollider.height) || !playerController.isGrounded) {
+            return;
         }
         
         playerStance = nextPlayerStance;
@@ -186,8 +178,11 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void SetPlayerSpeed(PlayerStance newPlayerStance) {
-        if (newPlayerStance == PlayerStance.Sprint || newPlayerStance == PlayerStance.Stand)
-            currentPlayerSpeed = playerSettings.playerSpeedSprint;
+        if (newPlayerStance == PlayerStance.Stand)
+            if(isSprinting)
+                currentPlayerSpeed = playerSettings.playerSpeedSprint;
+            else
+                currentPlayerSpeed = playerSettings.playerSpeedStand;
         else if (newPlayerStance == PlayerStance.Crouch)
             currentPlayerSpeed = playerSettings.playerSpeedCrouch;
         else if (newPlayerStance == PlayerStance.Prone)
@@ -195,9 +190,45 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private bool CanChangeStance(float stanceCheckHeight) {
-        
         Vector3 start = new Vector3(pivotTransform.position.x, pivotTransform.position.y + playerController.radius + 0.01f, pivotTransform.position.z);
         Vector3 end = new Vector3(pivotTransform.position.x, pivotTransform.position.y - playerController.radius - 0.01f + stanceCheckHeight, pivotTransform.position.z);
         return Physics.CheckCapsule(start, end, playerController.radius, playerMask);
+    }
+
+    private void InitializeInputActions() {
+        inputActions.Player.Movement.performed += e => {
+            inputMovement = e.ReadValue<Vector2>();
+        };
+
+        inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
+
+        inputActions.Player.Jump.performed += e => {
+            if (playerStance == PlayerStance.Stand)
+                if (e.interaction is UnityEngine.InputSystem.Interactions.TapInteraction)
+                    Jump(jumpMultiplier);
+                else
+                    Jump(doubleJumpMultiplier);
+            else
+                SetPlayerStance(PlayerStance.Stand);
+        };
+
+        inputActions.Player.Crouch.performed += e => SetPlayerStance(PlayerStance.Crouch);
+        inputActions.Player.Prone.performed += e => SetPlayerStance(PlayerStance.Prone);
+        
+        inputActions.Player.Sprinting.started += e => StartSprinting();
+
+        inputActions.Player.Sprinting.performed += e => StopSprinting();
+    }
+
+    private void StopSprinting() {
+        isSprinting = false;
+        SetPlayerSpeed(playerStance);
+    }
+
+    private void StartSprinting() {
+        if (!CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
+            isSprinting = true;
+            SetPlayerStance(PlayerStance.Stand);
+        }
     }
 }

@@ -186,7 +186,7 @@ public partial class @DefaultInput : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""2b0348fb-21a2-4a50-b4ed-932f47df1a55"",
                     ""path"": ""<Keyboard>/leftShift"",
-                    ""interactions"": """",
+                    ""interactions"": ""Press(behavior=1)"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Sprinting"",

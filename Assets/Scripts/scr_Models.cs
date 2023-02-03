@@ -8,7 +8,6 @@ public static class scr_Models{
     #region - Player -
 
     public enum PlayerStance {
-        Sprint,
         Stand,
         Crouch,
         Prone
