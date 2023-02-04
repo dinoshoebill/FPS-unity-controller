@@ -29,6 +29,7 @@ public static class scr_Models{
         public float playerSpeedStand;
         public float playerSpeedProne;
         public float playerSpeedCrouch;
+        public float playerMovementSmoothing;
 
         [Header("Jump Settings")]
         public float jumpPower;

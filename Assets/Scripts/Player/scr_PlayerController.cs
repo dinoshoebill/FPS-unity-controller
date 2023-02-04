@@ -17,11 +17,12 @@ public class scr_PlayerController : MonoBehaviour {
     private float jumpingForce;
     private float currentPlayerSpeed;
     private float strafeSpeedMultiplier = 0.7f;
+    private float strafeSpeedMultiplierSprint = 0.5f;
     private bool isSprinting;
 
     private float doubleJumpMultiplier = 1.3f;
     private float jumpMultiplier = 1f;
-    private float ViewInputSensitivity = 20f;
+    private float ViewInputSensitivity = 12f;
     private float gravityValue = -10f;
     private float gravityValueMultiplier = 5f;
     private float jumpingForceValue = 15f;
@@ -116,7 +117,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void CalculateMovement() { 
         var verticalSpeed = currentPlayerSpeed * inputMovement.y * Time.deltaTime;
-        var horizontalSpeed = currentPlayerSpeed * strafeSpeedMultiplier * inputMovement.x * Time.deltaTime;
+        var horizontalSpeed = currentPlayerSpeed * (isSprinting ? strafeSpeedMultiplierSprint : strafeSpeedMultiplier) * inputMovement.x * Time.deltaTime;
 
         Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
         newMovementDirection = transform.TransformDirection(newMovementDirection);
