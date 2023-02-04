@@ -16,28 +16,34 @@ public class scr_PlayerController : MonoBehaviour {
 
     private Vector2 speedMovement;
     private Vector2 speedMovementVelocity;
-    
+
+    private bool isSprinting;
     private float jumpingForce;
     private float currentPlayerSpeed;
+
     private float strafeSpeedMultiplier = 0.7f;
     private float strafeSpeedMultiplierSprint = 0.5f;
-    private bool isSprinting;
 
     private float doubleJumpMultiplier = 1.3f;
     private float jumpMultiplier = 1f;
+    private float jumpingForceValue = 15f;
+
     private float ViewInputSensitivity = 12f;
+
     private float gravityValue = -10f;
     private float gravityValueMultiplier = 5f;
-    private float jumpingForceValue = 15f;
-    private float playerSpeedSprintValue = 20f;
+
+    private float playerSpeedSprintValue = 10f;
     private float playerSpeedStandValue = 6f;
     private float playerSpeedCrouchValue = 4f;
     private float playerSpeedProneValue = 2f;
+
     private float ViewClampYMin = -80f;
     private float ViewClampYMax = 80f;
+
     private float playerStanceSmoothing = 12f;
     private float playerMovementSmoothing = 0.3f;
-    private bool DefaultInverted = false;
+    private bool defaultInverted = false;
 
     [Header("Preferences")]
     public Transform cameraHolder;
@@ -50,8 +56,6 @@ public class scr_PlayerController : MonoBehaviour {
     [Header("Stance")]
     public PlayerStance playerStance;
     private Vector3 playerCameraVelocity;
-    private float playerStanceVelocityFloat;
-    private Vector3 playerStanceVelocityVector;
     public Transform cameraPositionStand;
     public Transform cameraPositionCrouch;
     public Transform cameraPositionProne;
@@ -59,39 +63,16 @@ public class scr_PlayerController : MonoBehaviour {
     public PlayerStanceCollider playerStanceCrouch;
     public PlayerStanceCollider playerStanceProne;
 
+    private float playerStanceVelocityFloat;
+    private Vector3 playerStanceVelocityVector;
+
     private void Awake() {
 
         inputActions = new DefaultInput();
         playerController = GetComponent<CharacterController>();
 
         InitializeInputActions();
-
-        newPlayerRotation = transform.localRotation.eulerAngles;
-        newCameraRotation = cameraHolder.localRotation.eulerAngles;
-
-        playerSettings.viewXSensitivity = ViewInputSensitivity;
-        playerSettings.viewYSensitivity = ViewInputSensitivity;
-
-        playerSettings.viewXInverted = DefaultInverted;
-        playerSettings.viewYInverted = !DefaultInverted;
-
-        playerSettings.playerSpeedSprint = playerSpeedSprintValue;
-        playerSettings.playerSpeedStand = playerSpeedStandValue;
-        playerSettings.playerSpeedCrouch = playerSpeedCrouchValue;
-        playerSettings.playerSpeedProne = playerSpeedProneValue;
-
-        playerSettings.viewClampYMin = ViewClampYMin;
-        playerSettings.viewClampYMax = ViewClampYMax;
-
-        playerSettings.gravity = gravityValue;
-        playerSettings.gravityMultiplier = gravityValueMultiplier;
-        playerSettings.playerMovementSmoothing = playerMovementSmoothing;
-
-        playerSettings.jumpPower = jumpingForceValue;
-
-        playerStance = PlayerStance.Stand;
-        isSprinting = false;
-        currentPlayerSpeed = playerSpeedStandValue;
+        InitializePlayerSettings();
 
         inputActions.Enable();
     }
@@ -222,6 +203,32 @@ public class scr_PlayerController : MonoBehaviour {
         inputActions.Player.Sprinting.started += e => StartSprinting();
 
         inputActions.Player.Sprinting.performed += e => StopSprinting();
+    }
+    private void InitializePlayerSettings() {
+
+        newPlayerRotation = transform.localRotation.eulerAngles;
+        newCameraRotation = cameraHolder.localRotation.eulerAngles;
+
+        playerSettings.viewXSensitivity = ViewInputSensitivity;
+        playerSettings.viewYSensitivity = ViewInputSensitivity;
+        playerSettings.viewXInverted = defaultInverted;
+        playerSettings.viewYInverted = !defaultInverted;
+
+        playerSettings.playerSpeedSprint = playerSpeedSprintValue;
+        playerSettings.playerSpeedStand = playerSpeedStandValue;
+        playerSettings.playerSpeedCrouch = playerSpeedCrouchValue;
+        playerSettings.playerSpeedProne = playerSpeedProneValue;
+
+        playerSettings.viewClampYMin = ViewClampYMin;
+        playerSettings.viewClampYMax = ViewClampYMax;
+
+        playerSettings.jumpPower = jumpingForceValue;
+        playerSettings.gravity = gravityValue;
+        playerSettings.gravityMultiplier = gravityValueMultiplier;
+        playerSettings.playerMovementSmoothing = playerMovementSmoothing;
+
+        isSprinting = false;
+        playerStance = PlayerStance.Stand;
     }
 
     private void StopSprinting() {
