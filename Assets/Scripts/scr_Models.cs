@@ -25,25 +25,27 @@ public static class scr_Models {
         public float viewClampYMax;
 
         [Header("Movement Settings")]
+        public float playerSpeedSprint;
         public float playerSpeedStand;
         public float playerSpeedProne;
         public float playerSpeedCrouch;
-        public float strafeSpeedMultiplier;
+
+        [Header("Movement Smoothing")]
         public float playerMovementSmoothing;
         public float playerStanceSmoothing;
-
-
-        [Header("SprintSettings")]
-        public float playerSpeedSprint;
-        public float strafeSpeedMultiplierSprint;
+        public float playerAirTimeSmoothing;
 
         [Header("Jump Settings")]
         public float jumpPower;
-        public float doubleJumpMultiplier;
 
         [Header("Gravity Settings")]
         public float gravity;
+
+        [Header("Multipliers")]
+        public float strafeSpeedMultiplier;
+        public float strafeSpeedMultiplierSprint;
         public float gravityMultiplier;
+        public float doubleJumpMultiplier;
     }
 
     [Serializable]
