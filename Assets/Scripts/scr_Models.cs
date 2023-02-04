@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public static class scr_Models{
+public static class scr_Models {
 
     #region - Player -
 
@@ -25,16 +25,23 @@ public static class scr_Models{
         public float viewClampYMax;
 
         [Header("Movement Settings")]
-        public float playerSpeedSprint;
         public float playerSpeedStand;
         public float playerSpeedProne;
         public float playerSpeedCrouch;
+        public float strafeSpeedMultiplier;
         public float playerMovementSmoothing;
+        public float playerStanceSmoothing;
+
+
+        [Header("SprintSettings")]
+        public float playerSpeedSprint;
+        public float strafeSpeedMultiplierSprint;
 
         [Header("Jump Settings")]
         public float jumpPower;
+        public float doubleJumpMultiplier;
 
-        [Header("Jump Settings")]
+        [Header("Gravity Settings")]
         public float gravity;
         public float gravityMultiplier;
     }
