@@ -13,6 +13,9 @@ public class scr_PlayerController : MonoBehaviour {
 
     private Vector3 newCameraRotation;
     private Vector3 newPlayerRotation;
+
+    private Vector2 speedMovement;
+    private Vector2 speedMovementVelocity;
     
     private float jumpingForce;
     private float currentPlayerSpeed;
@@ -32,7 +35,8 @@ public class scr_PlayerController : MonoBehaviour {
     private float playerSpeedProneValue = 2f;
     private float ViewClampYMin = -80f;
     private float ViewClampYMax = 80f;
-    private float playerStanceSmoothing = 15f;
+    private float playerStanceSmoothing = 12f;
+    private float playerMovementSmoothing = 0.3f;
     private bool DefaultInverted = false;
 
     [Header("Preferences")]
@@ -81,6 +85,7 @@ public class scr_PlayerController : MonoBehaviour {
 
         playerSettings.gravity = gravityValue;
         playerSettings.gravityMultiplier = gravityValueMultiplier;
+        playerSettings.playerMovementSmoothing = playerMovementSmoothing;
 
         playerSettings.jumpPower = jumpingForceValue;
 
@@ -115,14 +120,14 @@ public class scr_PlayerController : MonoBehaviour {
         }
     }
 
-    private void CalculateMovement() { 
-        var verticalSpeed = currentPlayerSpeed * inputMovement.y * Time.deltaTime;
-        var horizontalSpeed = currentPlayerSpeed * (isSprinting ? strafeSpeedMultiplierSprint : strafeSpeedMultiplier) * inputMovement.x * Time.deltaTime;
+    private void CalculateMovement() {
 
-        Vector3 newMovementDirection = new Vector3(horizontalSpeed, jumpingForce * Time.deltaTime, verticalSpeed);
-        newMovementDirection = transform.TransformDirection(newMovementDirection);
+        speedMovement = Vector2.SmoothDamp(speedMovement, new Vector2(currentPlayerSpeed * inputMovement.y * Time.deltaTime, currentPlayerSpeed * (isSprinting ? strafeSpeedMultiplierSprint : strafeSpeedMultiplier) * inputMovement.x * Time.deltaTime), ref speedMovementVelocity, playerSettings.playerMovementSmoothing);
 
-        playerController.Move(newMovementDirection);
+        Vector3 newPlayerMovement = new Vector3(speedMovement.y, jumpingForce * Time.deltaTime, speedMovement.x);
+        newPlayerMovement = transform.TransformDirection(newPlayerMovement);
+
+        playerController.Move(newPlayerMovement);
     }
 
     private void CalculateView() {
