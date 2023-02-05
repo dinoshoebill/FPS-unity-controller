@@ -27,6 +27,8 @@ public class scr_PlayerController : MonoBehaviour {
 
     [Header("Settings")]
     public PlayerSettingsModel playerSettings;
+
+    [Header("Player Mask")]
     public LayerMask playerMask;
 
     [Header("Stance")]
@@ -63,17 +65,17 @@ public class scr_PlayerController : MonoBehaviour {
     private void CalculateCameraPosition() {
 
         if (playerStance == PlayerStance.Crouch) {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceCrouch.playerStanceCollider.height, ref playerStanceVelocityFloat, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceCrouch.playerStanceCollider.center, ref playerStanceVelocityVector, playerSettings.playerStanceSmoothing * Time.deltaTime);
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceCrouch.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceCrouch.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         } else if (playerStance == PlayerStance.Prone) {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceProne.playerStanceCollider.height, ref playerStanceVelocityFloat, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceProne.playerStanceCollider.center, ref playerStanceVelocityVector, playerSettings.playerStanceSmoothing * Time.deltaTime);
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceProne.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceProne.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         } else {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceStand.playerStanceCollider.height, ref playerStanceVelocityFloat, playerSettings.playerStanceSmoothing * Time.deltaTime);
-            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceStand.playerStanceCollider.center, ref playerStanceVelocityVector, playerSettings.playerStanceSmoothing * Time.deltaTime);
+            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceStand.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
+            playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceStand.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         }
     }
 
@@ -81,9 +83,9 @@ public class scr_PlayerController : MonoBehaviour {
 
         speedMovement = Vector2.SmoothDamp(speedMovement, 
             new Vector2(currentPlayerSpeed * inputMovement.y * Time.deltaTime, 
-                currentPlayerSpeed * (isSprinting ? playerSettings.strafeSpeedMultiplierSprint : playerSettings.strafeSpeedMultiplier) * inputMovement.x * Time.deltaTime), 
+                currentPlayerSpeed * (isSprinting ? playerSettings.speedStrafeMultiplierSprint : playerSettings.speedStrafeMultiplier) * inputMovement.x * Time.deltaTime), 
             ref speedMovementVelocity, 
-            playerSettings.playerMovementSmoothing, playerController.isGrounded ? playerSettings.playerMovementSmoothing : playerSettings.playerAirTimeSmoothing);
+            playerSettings.movementSmoothing, playerController.isGrounded ? playerSettings.movementSmoothing : playerSettings.airTimeSmoothing);
 
         Vector3 newPlayerMovement = new Vector3(speedMovement.y, jumpingForce * Time.deltaTime, speedMovement.x);
         newPlayerMovement = transform.TransformDirection(newPlayerMovement);
@@ -123,19 +125,21 @@ public class scr_PlayerController : MonoBehaviour {
     private void SetPlayerStance(PlayerStance nextPlayerStance) {
 
         if (nextPlayerStance == PlayerStance.Stand) {
-            if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
+            if (CanChangeStance(playerStanceStand.stanceCollider.height)) {
                 return;
             }
-        } else if (nextPlayerStance == PlayerStance.Crouch) {
+        }
+        else if (nextPlayerStance == PlayerStance.Crouch) {
             if (nextPlayerStance.CompareTo(playerStance) == 0) {
-                if (CanChangeStance(playerStanceStand.playerStanceCollider.height)) {
+                if (CanChangeStance(playerStanceStand.stanceCollider.height)) {
                     return;
-                } else {
+                }
+                else {
                     nextPlayerStance = PlayerStance.Stand;
                 }
+            } else if (CanChangeStance(playerStanceCrouch.stanceCollider.height) || !playerController.isGrounded) {
+                return;
             }
-        } else if (CanChangeStance(playerStanceCrouch.playerStanceCollider.height) || !playerController.isGrounded) {
-            return;
         }
         
         playerStance = nextPlayerStance;
@@ -145,13 +149,13 @@ public class scr_PlayerController : MonoBehaviour {
     private void SetPlayerSpeed(PlayerStance newPlayerStance) {
         if (newPlayerStance == PlayerStance.Stand)
             if(isSprinting)
-                currentPlayerSpeed = playerSettings.playerSpeedSprint;
+                currentPlayerSpeed = playerSettings.speedSprint;
             else
-                currentPlayerSpeed = playerSettings.playerSpeedStand;
+                currentPlayerSpeed = playerSettings.speedStand;
         else if (newPlayerStance == PlayerStance.Crouch)
-            currentPlayerSpeed = playerSettings.playerSpeedCrouch;
+            currentPlayerSpeed = playerSettings.speedCrouch;
         else if (newPlayerStance == PlayerStance.Prone)
-            currentPlayerSpeed = playerSettings.playerSpeedProne;
+            currentPlayerSpeed = playerSettings.speedProne;
     }
 
     private bool CanChangeStance(float stanceCheckHeight) {
@@ -194,10 +198,10 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.viewXInverted = false;
         playerSettings.viewYInverted = true;
 
-        playerSettings.playerSpeedSprint = 10;
-        playerSettings.playerSpeedStand = 6;
-        playerSettings.playerSpeedCrouch = 4;
-        playerSettings.playerSpeedProne = 2;
+        playerSettings.speedSprint = 10;
+        playerSettings.speedStand = 6;
+        playerSettings.speedCrouch = 4;
+        playerSettings.speedProne = 2;
 
         playerSettings.viewClampYMin = -80;
         playerSettings.viewClampYMax = 80;
@@ -207,12 +211,12 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.gravity = -10;
         playerSettings.gravityMultiplier = 5;
 
-        playerSettings.playerStanceSmoothing = 12f;
-        playerSettings.playerMovementSmoothing = 0.3f;
-        playerSettings.playerAirTimeSmoothing = 0.05f;
+        playerSettings.stanceSmoothing = 12f;
+        playerSettings.movementSmoothing = 0.3f;
+        playerSettings.airTimeSmoothing = 0.05f;
 
-        playerSettings.strafeSpeedMultiplier = 0.7f;
-        playerSettings.strafeSpeedMultiplierSprint = 0.5f;
+        playerSettings.speedStrafeMultiplier = 0.7f;
+        playerSettings.speedStrafeMultiplierSprint = 0.5f;
 
         playerSettings.doubleJumpMultiplier = 1.3f;
 
@@ -226,7 +230,7 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void StartSprinting() {
-        if (!CanChangeStance(playerStanceStand.playerStanceCollider.height) && inputMovement.y > 0) {
+        if (!CanChangeStance(playerStanceStand.stanceCollider.height) && inputMovement.y > 0) {
             isSprinting = true;
             SetPlayerStance(PlayerStance.Stand);
         }

@@ -25,15 +25,15 @@ public static class scr_Models {
         public float viewClampYMax;
 
         [Header("Movement Settings")]
-        public float playerSpeedSprint;
-        public float playerSpeedStand;
-        public float playerSpeedProne;
-        public float playerSpeedCrouch;
+        public float speedSprint;
+        public float speedStand;
+        public float speedProne;
+        public float speedCrouch;
 
         [Header("Movement Smoothing")]
-        public float playerMovementSmoothing;
-        public float playerStanceSmoothing;
-        public float playerAirTimeSmoothing;
+        public float movementSmoothing;
+        public float stanceSmoothing;
+        public float airTimeSmoothing;
 
         [Header("Jump Settings")]
         public float jumpPower;
@@ -42,17 +42,28 @@ public static class scr_Models {
         public float gravity;
 
         [Header("Multipliers")]
-        public float strafeSpeedMultiplier;
-        public float strafeSpeedMultiplierSprint;
+        public float speedStrafeMultiplier;
+        public float speedStrafeMultiplierSprint;
         public float gravityMultiplier;
         public float doubleJumpMultiplier;
     }
 
     [Serializable]
     public class PlayerStanceCollider {
-        public CapsuleCollider playerStanceCollider;
+        public CapsuleCollider stanceCollider;
     }
 
+    #endregion
+
+    #region - Weapons -
+    
+    public class WeaponsModelSettings {
+
+        [Header("Sway")]
+        public float swayAmount;
+        public float swaySmoothing;
+    }
+    
     #endregion
 
 }
