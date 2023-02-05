@@ -8,7 +8,8 @@ public class scr_PlayerController : MonoBehaviour {
 
     private CharacterController playerController;
     private DefaultInput inputActions;
-    private Vector2 inputMovement;
+    [HideInInspector]
+    public Vector2 inputMovement;
     [HideInInspector]
     public Vector2 inputView;
 
@@ -238,7 +239,7 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void StartSprinting() {
-        if (!CanChangeStance(playerStanceStand.stanceCollider.height) && inputMovement.y > 0) {
+        if (!CanChangeStance(playerStanceStand.stanceCollider.height) && inputMovement.y > 0 || playerStance == PlayerStance.Stand) {
             isSprinting = true;
             SetPlayerStance(PlayerStance.Stand);
         }
