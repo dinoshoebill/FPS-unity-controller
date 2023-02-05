@@ -9,7 +9,8 @@ public class scr_PlayerController : MonoBehaviour {
     private CharacterController playerController;
     private DefaultInput inputActions;
     private Vector2 inputMovement;
-    private Vector2 inputView;
+    [HideInInspector]
+    public Vector2 inputView;
 
     private Vector3 newCameraRotation;
     private Vector3 newPlayerRotation;
@@ -40,6 +41,9 @@ public class scr_PlayerController : MonoBehaviour {
     public PlayerStanceCollider playerStanceStand;
     public PlayerStanceCollider playerStanceCrouch;
     public PlayerStanceCollider playerStanceProne;
+
+    [Header("Weapon")]
+    public scr_WeaponController currentWeapon;
 
     private float playerStanceVelocityFloat;
     private Vector3 playerStanceVelocityVector;
@@ -222,6 +226,10 @@ public class scr_PlayerController : MonoBehaviour {
 
         isSprinting = false;
         SetPlayerStance(PlayerStance.Stand);
+
+        if(currentWeapon) {
+            currentWeapon.Initialize(this);
+        }
     }
 
     private void StopSprinting() {

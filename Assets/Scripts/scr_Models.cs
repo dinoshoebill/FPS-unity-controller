@@ -57,11 +57,17 @@ public static class scr_Models {
 
     #region - Weapons -
     
-    public class WeaponsModelSettings {
+    [Serializable]
+    public class WeaponsSettingsModel {
 
         [Header("Sway")]
         public float swayAmount;
         public float swaySmoothing;
+        public bool swayXInverted;
+        public bool swayYInverted;
+        public float swayResetSmoothing;
+        public float swayClampX;
+        public float swayClampY;
     }
     
     #endregion
