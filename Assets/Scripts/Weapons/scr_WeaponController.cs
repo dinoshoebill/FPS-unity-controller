@@ -44,7 +44,12 @@ public class scr_WeaponController : MonoBehaviour {
             return;
         }
 
-        weaponAnimator.speed = playerControllerScript.weaponAnimationSpeed;
+        CalculateWeaponSway();
+        SetWeaponAnimation();
+    }
+
+    private void CalculateWeaponSway() {
+        weaponAnimator.speed = playerControllerScript.weaponAnimationSpeed * weaponSettings.animationSpeedMultiplier;
 
         targetWeaponRotation.y += weaponSettings.swayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputView.x : playerControllerScript.inputView.x) * Time.deltaTime;
         targetWeaponRotation.x += weaponSettings.swayAmount * (weaponSettings.swayYInverted ? -playerControllerScript.inputView.y : playerControllerScript.inputView.y) * Time.deltaTime;
@@ -67,6 +72,10 @@ public class scr_WeaponController : MonoBehaviour {
         transform.localRotation = Quaternion.Euler(newWeaponRotation + newWeaponMovementRotation);
     }
 
+    private void SetWeaponAnimation() {
+        weaponAnimator.SetBool("isSprinting", playerControllerScript.isSprinting);
+    }
+
     private void InitializeWeaponSettings() {
 
         weaponSettings.swayAmount = 1;
@@ -81,5 +90,7 @@ public class scr_WeaponController : MonoBehaviour {
 
         weaponSettings.swayXInverted = false;
         weaponSettings.swayXInverted = true;
+
+        weaponSettings.animationSpeedMultiplier = 0.7f;
     }
 }

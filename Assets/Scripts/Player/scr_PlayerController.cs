@@ -19,7 +19,9 @@ public class scr_PlayerController : MonoBehaviour {
     private Vector2 speedMovement;
     private Vector2 speedMovementVelocity;
 
-    private bool isSprinting;
+    [HideInInspector]
+    public bool isSprinting;
+    public bool wantsSprinting;
     private float jumpingForce;
     private float currentPlayerSpeed;
 
@@ -176,6 +178,10 @@ public class scr_PlayerController : MonoBehaviour {
     private void InitializeInputActions() {
         inputActions.Player.Movement.performed += e => {
             inputMovement = e.ReadValue<Vector2>();
+
+            if(wantsSprinting) {
+                StartSprinting();
+            }
         };
 
         inputActions.Player.View.performed += e => inputView = e.ReadValue<Vector2>();
@@ -193,7 +199,7 @@ public class scr_PlayerController : MonoBehaviour {
         inputActions.Player.Crouch.performed += e => SetPlayerStance(PlayerStance.Crouch);
         inputActions.Player.Prone.performed += e => SetPlayerStance(PlayerStance.Prone);
         
-        inputActions.Player.Sprinting.started += e => StartSprinting();
+        inputActions.Player.Sprinting.started += e => WantsSprinting();
 
         inputActions.Player.Sprinting.performed += e => StopSprinting();
     }
@@ -230,6 +236,7 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.doubleJumpMultiplier = 1.3f;
 
         isSprinting = false;
+        wantsSprinting = false;
         SetPlayerStance(PlayerStance.Stand);
 
         if(currentWeapon) {
@@ -239,11 +246,20 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void StopSprinting() {
         isSprinting = false;
+        wantsSprinting = false;
         SetPlayerSpeed(playerStance);
     }
 
+    private void WantsSprinting() {
+        wantsSprinting = true;
+        StartSprinting();
+    }
+
     private void StartSprinting() {
-        if (!CanChangeStance(playerStanceStand.stanceCollider.height) && inputMovement.y > 0 || playerStance == PlayerStance.Stand) {
+        if(isSprinting) {
+            return;
+        } else if ((!CanChangeStance(playerStanceStand.stanceCollider.height) || playerStance == PlayerStance.Stand) && inputMovement.y > 0) {
+            wantsSprinting = false;
             isSprinting = true;
             SetPlayerStance(PlayerStance.Stand);
         }

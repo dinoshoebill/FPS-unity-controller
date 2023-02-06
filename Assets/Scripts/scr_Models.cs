@@ -75,6 +75,9 @@ public static class scr_Models {
         public float swaySmoothing;
         public float swayResetSmoothing;
 
+        [Header("Multipliers")]
+        public float animationSpeedMultiplier;
+
     }
     
     #endregion
