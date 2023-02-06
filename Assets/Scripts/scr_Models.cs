@@ -74,6 +74,7 @@ public static class scr_Models {
         [Header("Weapon Smoothing")]
         public float swaySmoothing;
         public float swayResetSmoothing;
+
     }
     
     #endregion

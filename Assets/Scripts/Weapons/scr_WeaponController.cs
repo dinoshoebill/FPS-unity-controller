@@ -7,6 +7,9 @@ public class scr_WeaponController : MonoBehaviour {
 
     private scr_PlayerController playerControllerScript;
 
+    [Header("References")]
+    public Animator weaponAnimator;
+
     [Header("Weapon Settings")]
     public WeaponsSettingsModel weaponSettings;
 
@@ -40,6 +43,8 @@ public class scr_WeaponController : MonoBehaviour {
         if(!isInitialized) {
             return;
         }
+
+        weaponAnimator.speed = playerControllerScript.weaponAnimationSpeed;
 
         targetWeaponRotation.y += weaponSettings.swayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputView.x : playerControllerScript.inputView.x) * Time.deltaTime;
         targetWeaponRotation.x += weaponSettings.swayAmount * (weaponSettings.swayYInverted ? -playerControllerScript.inputView.y : playerControllerScript.inputView.y) * Time.deltaTime;

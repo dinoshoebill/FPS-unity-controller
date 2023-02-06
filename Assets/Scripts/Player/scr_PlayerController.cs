@@ -23,6 +23,11 @@ public class scr_PlayerController : MonoBehaviour {
     private float jumpingForce;
     private float currentPlayerSpeed;
 
+    private float playerStanceVelocityFloat;
+    private Vector3 playerStanceVelocityVector;
+
+    public float weaponAnimationSpeed;
+
     [Header("Preferences")]
     public Transform cameraHolder;
     public Transform pivotTransform;
@@ -45,9 +50,6 @@ public class scr_PlayerController : MonoBehaviour {
 
     [Header("Weapon")]
     public scr_WeaponController currentWeapon;
-
-    private float playerStanceVelocityFloat;
-    private Vector3 playerStanceVelocityVector;
 
     private void Awake() {
 
@@ -94,6 +96,8 @@ public class scr_PlayerController : MonoBehaviour {
 
         Vector3 newPlayerMovement = new Vector3(speedMovement.y, jumpingForce * Time.deltaTime, speedMovement.x);
         newPlayerMovement = transform.TransformDirection(newPlayerMovement);
+
+        weaponAnimationSpeed = playerController.velocity.magnitude / (currentPlayerSpeed);
 
         playerController.Move(newPlayerMovement);
     }
