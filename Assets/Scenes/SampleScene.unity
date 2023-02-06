@@ -425,6 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7f8af6e08b2697499ad8700f22e3580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponAnimator: {fileID: 1087986590}
   weaponSettings:
     swayAmount: 1
     swayXInverted: 0
@@ -1277,6 +1278,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputMovement: {x: 0, y: 0}
   inputView: {x: 0, y: 0}
+  weaponAnimationSpeed: 0
   cameraHolder: {fileID: 323760933}
   pivotTransform: {fileID: 1685624607}
   playerSettings:
