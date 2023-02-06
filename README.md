@@ -8,3 +8,5 @@ Current progress:
 4. jumping and double jumping
 5. sprinting
 6. movement smoothing
+7. weapon sway
+8. walking animation
