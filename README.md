@@ -10,3 +10,4 @@ Current progress:
 6. movement smoothing
 7. weapon sway
 8. walking animation
+9. sprinting animation
