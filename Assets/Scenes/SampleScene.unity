@@ -436,6 +436,7 @@ MonoBehaviour:
     movementSwayAmount: 3
     swaySmoothing: 0.1
     swayResetSmoothing: 0.1
+    animationSpeedMultiplier: 0
   isInitialized: 0
 --- !u!1001 &929264390
 PrefabInstance:
@@ -1267,6 +1268,7 @@ MonoBehaviour:
   inputMovement: {x: 0, y: 0}
   inputView: {x: 0, y: 0}
   isSprinting: 0
+  wantsSprinting: 0
   weaponAnimationSpeed: 0
   cameraHolder: {fileID: 323760933}
   pivotTransform: {fileID: 1685624607}

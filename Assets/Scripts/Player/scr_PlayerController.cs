@@ -214,7 +214,7 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.viewYInverted = true;
 
         playerSettings.speedSprint = 10;
-        playerSettings.speedStand = 6;
+        playerSettings.speedStand = 7;
         playerSettings.speedCrouch = 4;
         playerSettings.speedProne = 2;
 
@@ -247,6 +247,7 @@ public class scr_PlayerController : MonoBehaviour {
     private void StopSprinting() {
         isSprinting = false;
         wantsSprinting = false;
+        currentWeapon.SetWeaponAnimation();
         SetPlayerSpeed(playerStance);
     }
 
@@ -262,6 +263,7 @@ public class scr_PlayerController : MonoBehaviour {
             wantsSprinting = false;
             isSprinting = true;
             SetPlayerStance(PlayerStance.Stand);
+            currentWeapon.SetWeaponAnimation();
         }
     }
 }
