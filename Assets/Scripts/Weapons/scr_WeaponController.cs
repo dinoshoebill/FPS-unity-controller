@@ -18,6 +18,12 @@ public class scr_WeaponController : MonoBehaviour {
     Vector3 targetWeaponRotation;
     Vector3 targetWeaponRotationVelocity;
 
+    Vector3 newWeaponMovementRotation;
+    Vector3 newWeaponMovementRotationVelocity;
+
+    Vector3 targetWeaponMovementRotation;
+    Vector3 targetWeaponMovementRotationVelocity;
+
     public void Initialize(scr_PlayerController playerControllerScript) {
         this.playerControllerScript = playerControllerScript;
         isInitialized = true;
@@ -25,9 +31,12 @@ public class scr_WeaponController : MonoBehaviour {
 
     private void Start() {
         newWeaponRotation = transform.localRotation.eulerAngles;
+
+        InitializeWeaponSettings();
     }
 
     private void Update() {
+
         if(!isInitialized) {
             return;
         }
@@ -35,14 +44,37 @@ public class scr_WeaponController : MonoBehaviour {
         targetWeaponRotation.y += weaponSettings.swayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputView.x : playerControllerScript.inputView.x) * Time.deltaTime;
         targetWeaponRotation.x += weaponSettings.swayAmount * (weaponSettings.swayYInverted ? -playerControllerScript.inputView.y : playerControllerScript.inputView.y) * Time.deltaTime;
 
+        targetWeaponMovementRotation.z += weaponSettings.movementSwayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputMovement.x : playerControllerScript.inputMovement.x) * Time.deltaTime;
+        targetWeaponMovementRotation.x += weaponSettings.movementSwayAmount * (weaponSettings.swayYInverted ? -playerControllerScript.inputMovement.y : playerControllerScript.inputMovement.y) * Time.deltaTime;
+
         targetWeaponRotation.x = Mathf.Clamp(targetWeaponRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
         targetWeaponRotation.y = Mathf.Clamp(targetWeaponRotation.y, -weaponSettings.swayClampY, weaponSettings.swayClampY);
-        targetWeaponRotation.z = targetWeaponRotation.y;
+
+        targetWeaponMovementRotation.x = Mathf.Clamp(targetWeaponMovementRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
+        targetWeaponMovementRotation.z = Mathf.Clamp(targetWeaponMovementRotation.z, -weaponSettings.swayClampZ, weaponSettings.swayClampZ);
 
         targetWeaponRotation = Vector3.SmoothDamp(targetWeaponRotation, Vector3.zero, ref targetWeaponRotationVelocity, weaponSettings.swayResetSmoothing);
         newWeaponRotation = Vector3.SmoothDamp(newWeaponRotation, targetWeaponRotation, ref newWeaponRotationVelocity, weaponSettings.swaySmoothing);
 
-        transform.localRotation = Quaternion.Euler(newWeaponRotation);
+        targetWeaponMovementRotation = Vector3.SmoothDamp(targetWeaponMovementRotation, Vector3.zero, ref targetWeaponMovementRotationVelocity, weaponSettings.swayResetSmoothing);
+        newWeaponMovementRotation = Vector3.SmoothDamp(newWeaponMovementRotation, targetWeaponMovementRotation, ref newWeaponMovementRotationVelocity, weaponSettings.swaySmoothing);
+
+        transform.localRotation = Quaternion.Euler(newWeaponRotation + newWeaponMovementRotation);
     }
 
+    private void InitializeWeaponSettings() {
+
+        weaponSettings.swayAmount = 1;
+        weaponSettings.movementSwayAmount = 5;
+
+        weaponSettings.swayClampX = 3;
+        weaponSettings.swayClampY = 3;
+        weaponSettings.swayClampZ = 3;
+
+        weaponSettings.swaySmoothing = 0.1f;
+        weaponSettings.swayResetSmoothing = 0.1f;
+
+        weaponSettings.swayXInverted = false;
+        weaponSettings.swayXInverted = true;
+    }
 }

@@ -43,7 +43,7 @@ public static class scr_Models {
 
         [Header("Multipliers")]
         public float speedStrafeMultiplier;
-        public float speedStrafeMultiplierSprint;
+        public float speedStrafeSprintMultiplier;
         public float gravityMultiplier;
         public float doubleJumpMultiplier;
     }
@@ -66,6 +66,10 @@ public static class scr_Models {
         public bool swayYInverted;
         public float swayClampX;
         public float swayClampY;
+        public float swayClampZ;
+
+        [Header("Weapon Movement Sway")]
+        public float movementSwayAmount;
 
         [Header("Weapon Smoothing")]
         public float swaySmoothing;

@@ -88,7 +88,7 @@ public class scr_PlayerController : MonoBehaviour {
 
         speedMovement = Vector2.SmoothDamp(speedMovement, 
             new Vector2(currentPlayerSpeed * inputMovement.y * Time.deltaTime, 
-                currentPlayerSpeed * (isSprinting ? playerSettings.speedStrafeMultiplierSprint : playerSettings.speedStrafeMultiplier) * inputMovement.x * Time.deltaTime), 
+                currentPlayerSpeed * (isSprinting ? playerSettings.speedStrafeSprintMultiplier : playerSettings.speedStrafeMultiplier) * inputMovement.x * Time.deltaTime), 
             ref speedMovementVelocity, 
             playerSettings.movementSmoothing, playerController.isGrounded ? playerSettings.movementSmoothing : playerSettings.airTimeSmoothing);
 
@@ -221,7 +221,7 @@ public class scr_PlayerController : MonoBehaviour {
         playerSettings.airTimeSmoothing = 0.05f;
 
         playerSettings.speedStrafeMultiplier = 0.7f;
-        playerSettings.speedStrafeMultiplierSprint = 0.5f;
+        playerSettings.speedStrafeSprintMultiplier = 0.5f;
 
         playerSettings.doubleJumpMultiplier = 1.3f;
 
