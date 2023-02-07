@@ -1,5 +1,5 @@
-# FPS-unity-game
-First person shooter game using Unity for learning purposes as a beginner game developer project.
+# FPS-unity-controller
+First person shooter controller using Unity for learning purposes as a beginner game developer project.
 
 Current progress:
 1. WASD movement
