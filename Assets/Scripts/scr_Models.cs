@@ -69,6 +69,10 @@ public static class scr_Models {
         public float swayClampX;
         public float swayClampY;
         public float swayClampZ;
+        public float swayAmountA;
+        public float swayAmountB;
+        public float swayLerpSpeed;
+        public float swayScale;
 
         [Header("Weapon Movement Sway")]
         public float movementSwayAmount;

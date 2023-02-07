@@ -9,6 +9,7 @@ public class scr_WeaponController : MonoBehaviour {
 
     [Header("References")]
     public Animator weaponAnimator;
+    public Transform weaponSwayObject;
 
     [Header("Weapon Settings")]
     public WeaponsSettingsModel weaponSettings;
@@ -27,6 +28,9 @@ public class scr_WeaponController : MonoBehaviour {
     Vector3 targetWeaponMovementRotation;
     Vector3 targetWeaponMovementRotationVelocity;
 
+    public Vector3 swayPosition;
+    public float swayTime;
+
     public void Initialize(scr_PlayerController playerControllerScript) {
         this.playerControllerScript = playerControllerScript;
         isInitialized = true;
@@ -44,10 +48,11 @@ public class scr_WeaponController : MonoBehaviour {
             return;
         }
 
+        CalculateWeaponRotation();
         CalculateWeaponSway();
     }
 
-    private void CalculateWeaponSway() {
+    private void CalculateWeaponRotation() {
         weaponAnimator.speed = playerControllerScript.weaponAnimationSpeed * weaponSettings.animationSpeedMultiplier;
 
         targetWeaponRotation.y += weaponSettings.swayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputView.x : playerControllerScript.inputView.x) * Time.deltaTime;
@@ -91,5 +96,30 @@ public class scr_WeaponController : MonoBehaviour {
         weaponSettings.animationSpeedMultiplier = 0.5f;
 
         weaponSettings.weaponSprintResetSmoothing = 0.3f;
+
+        weaponSettings.swayScale = 400;
+        weaponSettings.swayAmountA = 1;
+        weaponSettings.swayAmountB = 2;
+        weaponSettings.swayLerpSpeed = 1;
+
+        swayTime = 0;
+    }
+
+    private void CalculateWeaponSway() {
+        Vector3 targetPosition = LissajousCurve(swayTime, weaponSettings.swayAmountA, weaponSettings.swayAmountB) / weaponSettings.swayScale;
+        swayPosition = Vector3.Lerp(swayPosition, targetPosition, Time.smoothDeltaTime * weaponSettings.swayLerpSpeed);
+
+        swayTime += Time.deltaTime;
+        
+        if(swayTime > 6.5f) {
+            swayTime = 0;
+        }
+
+
+        weaponSwayObject.localPosition = swayPosition;
+    }
+
+    private Vector3 LissajousCurve(float Time, float A, float B) {
+        return new Vector3(Mathf.Sin(Time), A * Mathf.Sin(B * Time * Mathf.PI));
     }
 }
