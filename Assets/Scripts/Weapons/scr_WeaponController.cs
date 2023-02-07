@@ -63,7 +63,6 @@ public class scr_WeaponController : MonoBehaviour {
         newWeaponMovementRotation = Vector3.SmoothDamp(newWeaponMovementRotation, targetWeaponMovementRotation, ref newWeaponMovementRotationVelocity, weaponSettings.swaySmoothing);
 
         Vector3 combinedWeaponRotation = newWeaponRotation + newWeaponMovementRotation;
-
         combinedWeaponRotation.x = Mathf.Clamp(combinedWeaponRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
         combinedWeaponRotation.y = Mathf.Clamp(combinedWeaponRotation.y, -weaponSettings.swayClampY, weaponSettings.swayClampY);
         combinedWeaponRotation.z = Mathf.Clamp(combinedWeaponRotation.z, -weaponSettings.swayClampZ, weaponSettings.swayClampZ);
