@@ -31,8 +31,9 @@ public class scr_PlayerController : MonoBehaviour {
     public float weaponAnimationSpeed;
 
     [Header("Preferences")]
-    public Transform cameraHolder;
+    public Transform headPosition;
     public Transform pivotTransform;
+    public Transform cameraHolder;
 
     [Header("Settings")]
     public PlayerSettingsModel playerSettings;
@@ -73,15 +74,15 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void CalculateCameraPosition() {
         if (playerStance == PlayerStance.Crouch) {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            headPosition.transform.localPosition = Vector3.SmoothDamp(headPosition.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceCrouch.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceCrouch.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         } else if (playerStance == PlayerStance.Prone) {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            headPosition.transform.localPosition = Vector3.SmoothDamp(headPosition.transform.localPosition, cameraPositionProne.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceProne.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceProne.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         } else {
-            cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
+            headPosition.transform.localPosition = Vector3.SmoothDamp(headPosition.transform.localPosition, cameraPositionStand.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceStand.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.center = Vector3.SmoothDamp(playerController.center, playerStanceStand.stanceCollider.center, ref playerStanceVelocityVector, playerSettings.stanceSmoothing * Time.deltaTime);
         }
@@ -114,6 +115,7 @@ public class scr_PlayerController : MonoBehaviour {
             playerStance == PlayerStance.Prone ? playerSettings.viewProneClampYMax : playerSettings.viewClampYMax);
 
         cameraHolder.localRotation = Quaternion.Euler(newCameraRotation);
+        currentWeapon.transform.localRotation = Quaternion.Euler(newCameraRotation);
     }
 
     private void ApplyGravity() {
