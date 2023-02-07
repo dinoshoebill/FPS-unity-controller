@@ -56,18 +56,17 @@ public class scr_WeaponController : MonoBehaviour {
         targetWeaponMovementRotation.z += weaponSettings.movementSwayAmount * (weaponSettings.swayXInverted ? -playerControllerScript.inputMovement.x : playerControllerScript.inputMovement.x) * Time.deltaTime;
         targetWeaponMovementRotation.x += weaponSettings.movementSwayAmount * (weaponSettings.swayYInverted ? -playerControllerScript.inputMovement.y : playerControllerScript.inputMovement.y) * Time.deltaTime;
 
-        targetWeaponRotation.x = Mathf.Clamp(targetWeaponRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
-        targetWeaponRotation.y = Mathf.Clamp(targetWeaponRotation.y, -weaponSettings.swayClampY, weaponSettings.swayClampY);
-
-        targetWeaponMovementRotation.x = Mathf.Clamp(targetWeaponMovementRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
-        targetWeaponMovementRotation.z = Mathf.Clamp(targetWeaponMovementRotation.z, -weaponSettings.swayClampZ, weaponSettings.swayClampZ);
-
         targetWeaponRotation = Vector3.SmoothDamp(targetWeaponRotation, Vector3.zero, ref targetWeaponRotationVelocity, weaponSettings.swayResetSmoothing);
         newWeaponRotation = Vector3.SmoothDamp(newWeaponRotation, targetWeaponRotation, ref newWeaponRotationVelocity, weaponSettings.swaySmoothing);
 
         targetWeaponMovementRotation = Vector3.SmoothDamp(targetWeaponMovementRotation, Vector3.zero, ref targetWeaponMovementRotationVelocity, weaponSettings.swayResetSmoothing);
         newWeaponMovementRotation = Vector3.SmoothDamp(newWeaponMovementRotation, targetWeaponMovementRotation, ref newWeaponMovementRotationVelocity, weaponSettings.swaySmoothing);
 
+        Vector3 combinedWeaponRotation = newWeaponRotation + newWeaponMovementRotation;
+
+        combinedWeaponRotation.x = Mathf.Clamp(combinedWeaponRotation.x, -weaponSettings.swayClampX, weaponSettings.swayClampX);
+        combinedWeaponRotation.y = Mathf.Clamp(combinedWeaponRotation.y, -weaponSettings.swayClampY, weaponSettings.swayClampY);
+        combinedWeaponRotation.z = Mathf.Clamp(combinedWeaponRotation.z, -weaponSettings.swayClampZ, weaponSettings.swayClampZ);
         transform.localRotation = Quaternion.Euler(newWeaponRotation + newWeaponMovementRotation);
     }
 

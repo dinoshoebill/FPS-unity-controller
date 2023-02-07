@@ -72,7 +72,6 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void CalculateCameraPosition() {
-
         if (playerStance == PlayerStance.Crouch) {
             cameraHolder.transform.localPosition = Vector3.SmoothDamp(cameraHolder.transform.localPosition, cameraPositionCrouch.transform.localPosition, ref playerCameraVelocity, playerSettings.stanceSmoothing * Time.deltaTime);
             playerController.height = Mathf.SmoothDamp(playerController.height, playerStanceCrouch.stanceCollider.height, ref playerStanceVelocityFloat, playerSettings.stanceSmoothing * Time.deltaTime);
@@ -89,7 +88,6 @@ public class scr_PlayerController : MonoBehaviour {
     }
 
     private void CalculateMovement() {
-
         speedMovement = Vector2.SmoothDamp(speedMovement, 
             new Vector2(currentPlayerSpeed * inputMovement.y * Time.deltaTime, 
                 currentPlayerSpeed * (isSprinting ? playerSettings.speedStrafeSprintMultiplier : playerSettings.speedStrafeMultiplier) * inputMovement.x * Time.deltaTime), 
@@ -110,7 +108,10 @@ public class scr_PlayerController : MonoBehaviour {
         transform.localRotation = Quaternion.Euler(newPlayerRotation);
 
         newCameraRotation.x += playerSettings.viewYSensitivity * (playerSettings.viewYInverted ? -inputView.y : inputView.y) * Time.deltaTime;
-        newCameraRotation.x = Mathf.Clamp(newCameraRotation.x, playerSettings.viewClampYMin, playerSettings.viewClampYMax);
+        newCameraRotation.x = Mathf.Clamp(
+            newCameraRotation.x, 
+            playerStance == PlayerStance.Prone ? playerSettings.viewProneClampYMin : playerSettings.viewClampYMin, 
+            playerStance == PlayerStance.Prone ? playerSettings.viewProneClampYMax : playerSettings.viewClampYMax);
 
         cameraHolder.localRotation = Quaternion.Euler(newCameraRotation);
     }
@@ -220,6 +221,8 @@ public class scr_PlayerController : MonoBehaviour {
 
         playerSettings.viewClampYMin = -80;
         playerSettings.viewClampYMax = 80;
+        playerSettings.viewProneClampYMin = -30;
+        playerSettings.viewProneClampYMax = 50;
 
         playerSettings.jumpPower = 15;
 

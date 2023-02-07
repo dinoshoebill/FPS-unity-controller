@@ -23,6 +23,8 @@ public static class scr_Models {
         public bool viewYInverted;
         public float viewClampYMin;
         public float viewClampYMax;
+        public float viewProneClampYMin;
+        public float viewProneClampYMax;
 
         [Header("Movement Settings")]
         public float speedSprint;
