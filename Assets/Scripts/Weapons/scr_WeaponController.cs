@@ -31,6 +31,9 @@ public class scr_WeaponController : MonoBehaviour {
     public Vector3 swayPosition;
     public float swayTime;
 
+    [HideInInspector]
+    public bool isAiming;
+
     public void Initialize(scr_PlayerController playerControllerScript) {
         this.playerControllerScript = playerControllerScript;
         isInitialized = true;
@@ -103,6 +106,8 @@ public class scr_WeaponController : MonoBehaviour {
         weaponSettings.swayLerpSpeed = 1;
 
         swayTime = 0;
+
+        isAiming = false;
     }
 
     private void CalculateWeaponSway() {

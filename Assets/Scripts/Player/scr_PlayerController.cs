@@ -7,10 +7,9 @@ using static scr_Models;
 public class scr_PlayerController : MonoBehaviour {
 
     private CharacterController playerController;
-    private DefaultInput inputActions;
+    private PlayerInput inputActions;
     [HideInInspector]
     public Vector2 inputMovement;
-    [HideInInspector]
     public Vector2 inputView;
 
     private Vector3 newCameraRotation;
@@ -21,6 +20,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     [HideInInspector]
     public bool isSprinting;
+    public bool isAiming;
     public bool wantsSprinting;
     private float jumpingForce;
     private float currentPlayerSpeed;
@@ -56,7 +56,7 @@ public class scr_PlayerController : MonoBehaviour {
 
     private void Awake() {
 
-        inputActions = new DefaultInput();
+        inputActions = new PlayerInput();
         playerController = GetComponent<CharacterController>();
 
         InitializeInputActions();
@@ -70,6 +70,7 @@ public class scr_PlayerController : MonoBehaviour {
         CalculateMovement();
         ApplyGravity();
         CalculateCameraPosition();
+        calculateAiming();
     }
 
     private void CalculateCameraPosition() {
@@ -205,6 +206,9 @@ public class scr_PlayerController : MonoBehaviour {
         inputActions.Player.Sprinting.started += e => WantsSprinting();
 
         inputActions.Player.Sprinting.performed += e => StopSprinting();
+
+        inputActions.Weapon.FirePressed.performed += e => AimingPressed();
+        inputActions.Weapon.FireReleased.performed += e => AimingReleased();
     }
     private void InitializePlayerSettings() {
 
@@ -242,6 +246,7 @@ public class scr_PlayerController : MonoBehaviour {
 
         isSprinting = false;
         wantsSprinting = false;
+        isAiming = false;
         SetPlayerStance(PlayerStance.Stand);
 
         if(currentWeapon) {
@@ -270,5 +275,21 @@ public class scr_PlayerController : MonoBehaviour {
             SetPlayerStance(PlayerStance.Stand);
             currentWeapon.SetWeaponAnimation();
         }
+    }
+
+    private void AimingPressed() {
+        isAiming = true;
+    }
+
+    private void AimingReleased() {
+        isAiming = false;
+    }
+
+    private void calculateAiming() {
+        if(!currentWeapon.isInitialized) {
+            return;
+        }
+
+        currentWeapon.isAiming = isAiming;
     }
 }
