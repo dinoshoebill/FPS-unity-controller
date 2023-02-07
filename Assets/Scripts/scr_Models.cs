@@ -76,6 +76,7 @@ public static class scr_Models {
         [Header("Weapon Smoothing")]
         public float swaySmoothing;
         public float swayResetSmoothing;
+        public float weaponSprintResetSmoothing;
 
         [Header("Multipliers")]
         public float animationSpeedMultiplier;

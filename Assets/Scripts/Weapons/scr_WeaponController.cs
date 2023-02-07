@@ -89,5 +89,7 @@ public class scr_WeaponController : MonoBehaviour {
         weaponSettings.swayXInverted = true;
 
         weaponSettings.animationSpeedMultiplier = 0.5f;
+
+        weaponSettings.weaponSprintResetSmoothing = 0.3f;
     }
 }
